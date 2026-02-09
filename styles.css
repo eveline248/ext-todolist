@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+
+body {
+  min-width: 320px;
+  max-width: 100%;
+  min-height: 400px;
+  position: relative;
+  vertical-align:middle;
+  font-family: 'Inter', sans-serif;
+}
+
+.heading {
+    padding-left: 1.5em;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.top-icons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5em 1em;
+
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding-left: 4em;
+}
+
+#task-input {
+    flex: 1;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    outline: none;
+}
+
+.plus-icon {
+    cursor: pointer;
+}
+
+#add-task-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+#task-list {
+    list-style-type: none;
+    padding-left: 4em;
+}
+
+#task-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.5em 0;
+    border-bottom: 1px solid #eee;
+}
+
+#task-list li:hover {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    
+}
+
+.task-list-container {
+    max-width: 283px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+#task-list li svg {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+#task-list li span {
+    display: inline-block;
+    vertical-align: middle;
+}

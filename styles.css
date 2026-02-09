@@ -87,3 +87,9 @@ body {
     display: inline-block;
     vertical-align: middle;
 }
+
+#task-list li.completed span{
+    text-decoration: line-through;
+    color: #888;
+    transition: all 0.3s ease; 
+}

@@ -4,9 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const taskList = document.getElementById('task-list');
     
     //trying for firefox compatibility but not yet working LOL
-    const storage = typeof browser !== 'undefined'
-    ? browser.storage
-    : chrome.storage;
+    const storage = typeof browser !== 'undefined' ? browser.storage : chrome.storage;
 
     //temporary storage because idk how storage works ;-; hence I store here then use your saveTask to store this array, its an array of task component:
     //{

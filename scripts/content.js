@@ -2,26 +2,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const addTaskButton = document.getElementById('add-task-button');
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
+
+    loadTask();
+
     
-    //trying for firefox compatibility but not yet working LOL
-    const storage = typeof browser !== 'undefined' ? browser.storage : chrome.storage;
+    function addTask(){
+        const taskText = taskInput.value.trim();
 
-    //temporary storage because idk how storage works ;-; hence I store here then use your saveTask to store this array, its an array of task component:
-    //{
-    //id
-    //taskName
-    //completed
-    //}
+        if(taskText === '') return;
 
-    let tasks = [];
+        //create task object to store multiple values inside
+        const task = {
+            id: Date.now(),
+            text: taskText,
+            completed: false,
+            createdAt: new Date().toISOString()
+        }
 
-    loadTasks();
-    
-    //create a task component, so I can store the status (completed or not)
-    function createTaskComponent(task){
+        chrome.storage.sync.get(['tasks'], function(result) {
+            //if false then get after ||
+            const tasks = result.tasks || [];
+
+            tasks.push(task);
+
+            chrome.storage.sync.set({tasks: tasks}, function(){
+
+                addTaskToUI(task);
+
+                taskInput.value = '';
+                taskInput.focus();
+            });
+        })
+    }
+
+    function addTaskToUI(task) {
         const listItem = document.createElement('li');
-        
-        if(task.completed) listItem.classList.add('completed');
 
         const circleIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         circleIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
@@ -31,21 +46,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const circlePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         circlePath.setAttribute('fill', 'currentColor');
-        //a ? b : c basically if a is true then b else c
-        circlePath.setAttribute('d', task.completed ?  'M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20' : 'M11.5 3a9.5 9.5 0 0 1 9.5 9.5a9.5 9.5 0 0 1-9.5 9.5A9.5 9.5 0 0 1 2 12.5A9.5 9.5 0 0 1 11.5 3m0 1A8.5 8.5 0 0 0 3 12.5a8.5 8.5 0 0 0 8.5 8.5a8.5 8.5 0 0 0 8.5-8.5A8.5 8.5 0 0 0 11.5 4');
+        circlePath.setAttribute('d', 'M11.5 3a9.5 9.5 0 0 1 9.5 9.5a9.5 9.5 0 0 1-9.5 9.5A9.5 9.5 0 0 1 2 12.5A9.5 9.5 0 0 1 11.5 3m0 1A8.5 8.5 0 0 0 3 12.5a8.5 8.5 0 0 0 8.5 8.5a8.5 8.5 0 0 0 8.5-8.5A8.5 8.5 0 0 0 11.5 4');
         circleIcon.appendChild(circlePath);
         listItem.appendChild(circleIcon);
 
-        //toggle status
-        circleIcon.addEventListener('click', () => {
-            task.completed = !task.completed;
-            saveTasks();
-            loadTasks();
-        });
-
-        const textSpan = document.createElement('span');
-        textSpan.textContent = task.text;
-        listItem.appendChild(textSpan);
+        const taskSpan = document.createElement('span');
+        taskSpan.textContent = task.text;
+        listItem.appendChild(taskSpan);
 
         const trashIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         trashIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
@@ -59,56 +66,24 @@ document.addEventListener('DOMContentLoaded', function() {
         trashIcon.appendChild(trashPath);
         listItem.appendChild(trashIcon);
 
-        return listItem;
+        taskList.appendChild(listItem);
     }
 
-    function loadTasks() {
-        storage.sync.get(['todoList'], function(result) {
-            tasks = result.todoList || [];
+    function loadTask() {
+        chrome.storage.sync.get(['tasks'], function(result) {
+            const tasks = result.tasks || [];
             taskList.innerHTML = '';
-
-            tasks.forEach(task => {
-                taskList.appendChild(createTaskComponent(task));
-            });
-        });
+            
+            tasks.forEach(function(task){
+                addTaskToUI(task);
+            })
+        })
     }
-
-    function addTask() {
-        const taskText = taskInput.value.trim();
-        if (taskText !== '') {
-            const listItem = document.createElement('li');
-            const circleIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            circleIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            circleIcon.setAttribute('width', '24');
-            circleIcon.setAttribute('height', '24');
-            circleIcon.setAttribute('viewBox', '0 0 24 24');
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('fill', 'currentColor');
-            path.setAttribute('d', 'M11.5 3a9.5 9.5 0 0 1 9.5 9.5a9.5 9.5 0 0 1-9.5 9.5A9.5 9.5 0 0 1 2 12.5A9.5 9.5 0 0 1 11.5 3m0 1A8.5 8.5 0 0 0 3 12.5a8.5 8.5 0 0 0 8.5 8.5a8.5 8.5 0 0 0 8.5-8.5A8.5 8.5 0 0 0 11.5 4');
-            circleIcon.appendChild(path);
-            listItem.appendChild(circleIcon);
-            const textSpan = document.createElement('span');
-            textSpan.textContent = taskText;
-            listItem.appendChild(textSpan);
-            taskList.appendChild(listItem);
-            taskInput.value = '';
-            taskInput.focus();
-            saveTasks();
-        }
-    }
-
-    function saveTasks() {
-        storage.sync.set({todoList: tasks}, function() {
-            console.log("Tasks saved successfully.");
-        });
-    }
-
-    
 
     addTaskButton.addEventListener('click', addTask);
     taskInput.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
+        if(event.key === 'Enter'){
             addTask();
         }
-    });
-}); 
+    })
+});

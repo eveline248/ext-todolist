@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function addTaskToUI(task) {
         const listItem = document.createElement('li');
 
+        listItem.dataset.id = task.id;
+
         const circleIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         circleIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         circleIcon.setAttribute('width', '24');
@@ -57,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const trashIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         trashIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         trashIcon.setAttribute('width', '24');
-        trashIcon.setAttribute('height', 24);
+        trashIcon.setAttribute('height', '24');
         trashIcon.setAttribute('viewBox', '0 0 24 24');
 
         const trashPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -67,6 +69,24 @@ document.addEventListener('DOMContentLoaded', function() {
         listItem.appendChild(trashIcon);
 
         taskList.appendChild(listItem);
+
+        trashIcon.addEventListener('click', function(event){
+            const taskId = parseInt(listItem.dataset.id);
+            deleteTask(taskId);
+            listItem.remove();
+
+        })
+    }
+
+    function deleteTask(taskId){
+        chrome.storage.sync.get(['tasks'], function(result){
+            let tasks = result.tasks || [];
+            tasks = tasks.filter(task => task.id !== taskId);
+
+            chrome.storage.sync.set({tasks: tasks}, function(){
+                return;
+            })
+        })
     }
 
     function loadTask() {

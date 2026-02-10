@@ -88,6 +88,7 @@ body {
     vertical-align: middle;
 }
 
+
 #task-list li svg:last-of-type {
     opacity: 0;
     transition: opacity 0.2s ease;
@@ -104,4 +105,10 @@ body {
 
 #task-list li svg:last-of-type:hover {
     color: black;
+}
+
+#task-list li.completed span{
+    text-decoration: line-through;
+    color: #888;
+    transition: all 0.3s ease; 
 }

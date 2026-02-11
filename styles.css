@@ -112,3 +112,26 @@ body {
     color: #888;
     transition: all 0.3s ease; 
 }
+
+.circle-icon {
+    cursor: pointer;
+    transition: all 0.5s ease;
+}
+
+.circle-icon path {
+    transition: fill 0.5s ease, transform 0.5s ease;
+}
+
+.circle-fill {
+    transition: r 0.5s ease;
+    r: 0
+}
+
+.circle-icon.completed .circle-fill {
+    r: 10;
+}
+
+.circle-icon.completed path {
+    color: #4caf50;
+}
+

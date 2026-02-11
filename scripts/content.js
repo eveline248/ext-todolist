@@ -45,6 +45,15 @@ document.addEventListener('DOMContentLoaded', function() {
         circleIcon.setAttribute('width', '24');
         circleIcon.setAttribute('height', '24');
         circleIcon.setAttribute('viewBox', '0 0 24 24');
+        circleIcon.classList.add('circle-icon');
+
+        const fillCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        fillCircle.setAttribute('cx', '12');
+        fillCircle.setAttribute('cy', '12');
+        fillCircle.setAttribute('r', '0');
+        fillCircle.setAttribute('fill', '#4CAF50');
+        fillCircle.classList.add('circle-fill');
+        circleIcon.appendChild(fillCircle);
 
         const circlePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         circlePath.setAttribute('fill', 'currentColor');
@@ -54,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const taskSpan = document.createElement('span');
         taskSpan.textContent = task.text;
+        taskSpan.classList.add('task-text');
         listItem.appendChild(taskSpan);
 
         const trashIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -76,6 +86,15 @@ document.addEventListener('DOMContentLoaded', function() {
             listItem.remove();
 
         })
+
+        circleIcon.addEventListener('click', function(){
+            task.completed = true;
+
+            circleIcon.classList.toggle('completed', task.completed);
+            taskSpan.classList.toggle('completed', task.completed);
+
+            updateTaskInStorage(task);
+        })
     }
 
     function deleteTask(taskId){
@@ -89,12 +108,22 @@ document.addEventListener('DOMContentLoaded', function() {
         })
     }
 
+    function updateTaskInStorage(updatedTask) {
+        chrome.storage.sync.get(['tasks'], function(result){
+            let tasks = result.tasks || [];
+            tasks = tasks.map(task =>
+                task.id === updatedTask.id ? updatedTask: task
+            );
+            chrome.storage.sync.set({tasks: tasks});
+        });
+    }
     function loadTask() {
         chrome.storage.sync.get(['tasks'], function(result) {
             const tasks = result.tasks || [];
             taskList.innerHTML = '';
             
-            tasks.forEach(function(task){
+            const incompleteTasks = tasks.filter(task => !task.completed);
+            incompleteTasks.forEach(function(task){
                 addTaskToUI(task);
             })
         })
